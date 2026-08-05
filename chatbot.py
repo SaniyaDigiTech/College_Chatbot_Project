@@ -22,7 +22,7 @@ from langchain_core.messages import (
 
 DB_PATH = "srki.db"
 MODEL = "llama-3.3-70b-versatile"
-LOGO_PATH = "Assets/srki logo.png"
+LOGO_PATH = "srki logo.png"
 
 # Streamlit configurations
 
