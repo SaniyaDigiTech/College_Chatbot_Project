@@ -22,7 +22,7 @@ from langchain_core.messages import (
 
 DB_PATH = "srki.db"
 MODEL = "openai/gpt-oss-120b"
-LOGO_PATH = "Assets/srki logo.png"
+LOGO_PATH = "srki logo.png"
 
 # Streamlit configurations- confirmation of the Streamlit 
 
