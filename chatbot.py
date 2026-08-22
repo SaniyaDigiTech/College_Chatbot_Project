@@ -21,7 +21,7 @@ from langchain_core.messages import (
 )
 
 DB_PATH = "srki.db"
-MODEL = "llama-3.3-70b-versatile"
+MODEL = "openai/gpt-oss-120b"
 LOGO_PATH = "srki logo.png"
 
 # Streamlit configurations
