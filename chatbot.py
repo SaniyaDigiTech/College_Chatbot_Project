@@ -22,9 +22,9 @@ from langchain_core.messages import (
 
 DB_PATH = "srki.db"
 MODEL = "openai/gpt-oss-120b"
-LOGO_PATH = "srki logo.png"
+LOGO_PATH = "Assets/srki logo.png"
 
-# Streamlit configurations
+# Streamlit configurations- confirmation of the Streamlit 
 
 st.set_page_config(
     page_title="SRKI AI Assistant",
@@ -52,31 +52,54 @@ LOGO_IMG_TAG = (
 #CSS
 CUSTOM_CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 :root {
-    --navy: #1B2A4A;
-    --navy-light: #24365e;
-    --maroon: #6E2B34;
-    --gold: #C9A44C;
-    --parchment: #F7F2E7;
-    --parchment-card: #FDFAF3;
-    --ink: #2B2B28;
-    --ink-soft: #5b5952;
+    --bg: #0a0b0d;
+    --bg-panel: #131519;
+    --bg-elevated: #1a1d22;
+    --border: #2a2d33;
+    --border-soft: #1e2126;
+    --ink: #ecedef;
+    --ink-soft: #8f96a1;
+    --gold: #c9a44c;
+    --gold-soft: rgba(201, 164, 76, 0.12);
+    --gold-dim: #a88638;
+    --red: #e5484d;
 }
 
 /* ---- Base page ---- */
-html, body, [class*="css"]  {
-    font-family: 'Source Sans 3', sans-serif;
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
     color: var(--ink);
 }
-.stApp {
-    background: var(--parchment);
+html, body {
+    background: var(--bg) !important;
+}
+.stApp,
+[data-testid="stAppViewContainer"],
+[data-testid="stBottom"],
+[data-testid="stBottomBlockContainer"],
+[data-testid="stMain"] {
+    background: var(--bg) !important;
 }
 h1, h2, h3, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
-    font-family: 'Fraunces', serif;
-    color: var(--navy);
+    font-family: 'Source Serif 4', serif;
+    color: var(--ink);
+    font-weight: 600;
 }
+[data-testid="stHeader"], [data-testid="stToolbar"] {
+    background: transparent;
+}
+::selection {
+    background: var(--gold-soft);
+    color: var(--ink);
+}
+/* thin dark scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
 
 /* ---- Masthead ---- */
 .srki-masthead {
@@ -84,22 +107,21 @@ h1, h2, h3, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
     align-items: center;
     gap: 16px;
     padding: 6px 0 18px 0;
-    border-bottom: 3px solid var(--gold);
     margin-bottom: 4px;
 }
 .srki-seal {
     flex-shrink: 0;
-    width: 54px;
-    height: 54px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
-    background: #FFFFFF;
-    border: 2px solid var(--gold);
+    background: var(--bg-panel);
+    border: 1px solid var(--gold);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 20px;
+    font-family: 'Source Serif 4', serif;
+    font-weight: 600;
+    font-size: 19px;
     color: var(--gold);
     letter-spacing: 1px;
     overflow: hidden;
@@ -107,162 +129,268 @@ h1, h2, h3, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
     box-sizing: border-box;
 }
 .srki-title {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 32px;
-    color: var(--navy);
-    line-height: 1.1;
+    font-family: 'Source Serif 4', serif;
+    font-weight: 600;
+    font-size: 28px;
+    color: var(--ink);
+    line-height: 1.15;
     margin: 0;
+    letter-spacing: -0.2px;
 }
 .srki-subtitle {
-    font-family: 'Source Sans 3', sans-serif;
-    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
     color: var(--ink-soft);
-    letter-spacing: 0.4px;
-    margin-top: 2px;
+    letter-spacing: 0.2px;
+    margin-top: 3px;
 }
 .srki-hairline {
-    height: 2px;
+    height: 1px;
     width: 100%;
-    background: var(--navy);
+    background: linear-gradient(90deg, var(--gold) 0%, var(--border) 40%, transparent 100%);
     margin-top: -18px;
-    margin-bottom: 22px;
-    opacity: 0.85;
+    margin-bottom: 24px;
 }
 .srki-chips {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
 }
 .srki-chip {
-    font-family: 'Source Sans 3', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--navy);
-    background: var(--parchment-card);
-    border: 1px solid var(--gold);
-    border-radius: 3px;
-    padding: 5px 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 13px;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+.srki-chip:hover {
+    border-color: var(--gold);
+    color: var(--gold);
 }
 
-/* ---- Sidebar: "registrar's desk" ---- */
+/* ---- Sidebar ---- */
 section[data-testid="stSidebar"] {
-    background: var(--navy);
-    border-right: 3px solid var(--gold);
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border);
 }
-/* Streamlit gives the sidebar a tall default top padding (space reserved
-   for the collapse arrow). Shrink it so it lines up with the main header. */
 section[data-testid="stSidebar"] div[data-testid="stSidebarUserContent"] {
-    padding-top: 1.2rem !important;
+    padding-top: 1.4rem !important;
 }
 section[data-testid="stSidebar"] div[data-testid="stSidebarContent"] {
-    padding-top: 1.2rem !important;
+    padding-top: 1.4rem !important;
 }
-/* Match the main content's top padding too, in case your Streamlit
-   version applies a bigger default there */
 div[data-testid="stAppViewContainer"] .main .block-container {
     padding-top: 2rem !important;
 }
 section[data-testid="stSidebar"] * {
-    color: var(--parchment) !important;
+    color: var(--ink) !important;
 }
 section[data-testid="stSidebar"] h1,
 section[data-testid="stSidebar"] h2,
 section[data-testid="stSidebar"] h3 {
-    font-family: 'Fraunces', serif;
-    color: var(--gold) !important;
+    font-family: 'Source Serif 4', serif;
+    color: var(--ink) !important;
+}
+section[data-testid="stSidebar"] .stCaption, section[data-testid="stSidebar"] small {
+    color: var(--ink-soft) !important;
 }
 section[data-testid="stSidebar"] hr {
-    border-color: rgba(201,164,76,0.35);
+    border-color: var(--border);
 }
-section[data-testid="stSidebar"] .stTextInput input {
-    background: var(--navy-light);
-    color: var(--parchment) !important;
-    border: 1px solid var(--gold);
-    border-radius: 3px;
+section[data-testid="stSidebar"] [data-testid="stTextInputRootElement"] {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    transition: border-color 0.15s ease;
 }
-section[data-testid="stSidebar"] .stCodeBlock, 
+section[data-testid="stSidebar"] [data-testid="stTextInputRootElement"]:focus-within {
+    border-color: var(--gold) !important;
+}
+section[data-testid="stSidebar"] [data-testid="stTextInputRootElement"] input {
+    background: transparent !important;
+    color: var(--ink) !important;
+    font-family: 'Inter', sans-serif;
+}
+section[data-testid="stSidebar"] [data-testid="stTextInputRootElement"] button {
+    background: transparent !important;
+}
+section[data-testid="stSidebar"] [data-testid="stTextInputRootElement"] [data-testid="stIconMaterial"] {
+    font-family: 'Material Symbols Rounded' !important;
+    color: var(--ink-soft) !important;
+}
+section[data-testid="stSidebar"] .stCodeBlock,
 section[data-testid="stSidebar"] code {
     font-family: 'IBM Plex Mono', monospace !important;
-    background: var(--navy-light) !important;
-    border: 1px solid rgba(201,164,76,0.4);
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border);
 }
 section[data-testid="stSidebar"] .stButton button {
     background: var(--gold);
-    color: var(--navy) !important;
+    color: #000000 important;
     font-weight: 600;
     border: none;
-    border-radius: 3px;
+    border-radius: 8px;
+    transition: background 0.15s ease;
 }
 section[data-testid="stSidebar"] .stButton button:hover {
-    background: #d9b968;
+    background: #ddb95f;
 }
 section[data-testid="stSidebar"] .stAlert {
-    background: var(--navy-light) !important;
-    border: 1px solid rgba(201,164,76,0.4);
-    border-radius: 3px;
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border);
+    border-radius: 8px;
 }
 
-/* ---- Chat messages: alternating "letter" cards ---- */
-[data-testid="stChatMessage"] {
-    border-radius: 4px;
-    padding: 14px 18px;
-    margin-bottom: 12px;
-    box-shadow: 0 1px 3px rgba(27,42,74,0.08);
+/* ---- Alerts (main area) ---- */
+.stAlert {
+    background: var(--bg-panel) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px;
+    color: var(--ink) !important;
 }
-/* user = odd position (message, then reply) -> maroon card, right-leaning */
+.stAlert p { color: var(--ink) !important; }
+
+/* ---- Chat messages ---- */
+[data-testid="stChatMessage"] > div:first-child {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border);
+    border-radius: 50% !important;
+}
+[data-testid="stChatMessage"] {
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    background: transparent;
+    border: none;
+}
+/* user = odd position -> subtle elevated bubble */
 [data-testid="stChatMessage"]:nth-of-type(odd) {
-    background: var(--maroon);
-    border-left: none;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
 }
 [data-testid="stChatMessage"]:nth-of-type(odd) p,
 [data-testid="stChatMessage"]:nth-of-type(odd) li,
 [data-testid="stChatMessage"]:nth-of-type(odd) span {
-    color: var(--parchment) !important;
+    color: var(--ink) !important;
 }
-/* assistant = even position -> parchment notice card, gold rule */
+/* assistant = even position -> flat, reads as continuous text */
 [data-testid="stChatMessage"]:nth-of-type(even) {
-    background: var(--parchment-card);
-    border-left: 4px solid var(--gold);
+    background: transparent;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+[data-testid="stChatMessage"] p,
+[data-testid="stChatMessage"] li,
+[data-testid="stChatMessage"] span {
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
 }
 [data-testid="stChatMessage"] table {
-    background: var(--parchment-card);
+    background: var(--bg-panel);
     border-collapse: collapse;
     width: 100%;
+    border: 1px solid var(--border);
 }
 [data-testid="stChatMessage"] th {
-    background: var(--navy);
-    color: var(--parchment);
-    font-family: 'Fraunces', serif;
-    padding: 6px 10px;
+    background: var(--bg-elevated);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
 }
 [data-testid="stChatMessage"] td {
-    padding: 6px 10px;
-    border-bottom: 1px solid rgba(27,42,74,0.15);
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border-soft);
+    color: var(--ink);
+}
+[data-testid="stChatMessage"] code {
+    background: var(--bg-elevated);
+    color: var(--gold);
+    font-family: 'IBM Plex Mono', monospace;
+    border-radius: 4px;
 }
 
-/* ---- Chat input ---- */
+/* ---- Chat input: soft rounded pill, minimal border, quiet by default ---- */
 [data-testid="stChatInput"] {
-    border-top: 2px solid var(--gold);
-    background: var(--parchment);
+    border-top: none;
+    background: var(--bg);
+    padding: 10px 0 6px 0;
+}
+[data-testid="stChatInput"] > div {
+    background: var(--bg-panel) !important;
+    border: 1px solid var(--border-soft) !important;
+    border-radius: 28px !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.30);
+    padding-left: 8px !important;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+[data-testid="stChatInput"]:focus-within > div {
+    border-color: var(--gold-dim) !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.30), 0 0 0 3px var(--gold-soft);
 }
 [data-testid="stChatInput"] textarea {
-    font-family: 'Source Sans 3', sans-serif;
-    border: 1px solid var(--navy) !important;
-    border-radius: 4px !important;
+    font-family: 'Inter', sans-serif;
+    color: var(--ink) !important;
+    background: transparent !important;
+    border: none !important;
+}
+[data-testid="stChatInput"] textarea::placeholder {
+    color: var(--ink-soft) !important;
+}
+[data-testid="stChatInput"] button {
+    background: var(--gold) !important;
+    border-radius: 50% !important;
+    width: 34px !important;
+    height: 34px !important;
+    margin-right: 6px !important;
+    transition: background 0.15s ease;
+}
+[data-testid="stChatInput"] button:hover:not(:disabled) {
+    background: #ddb95f !important;
+}
+[data-testid="stChatInput"] button svg {
+    fill: #191307 !important;
+}
+[data-testid="stChatInput"] button:disabled {
+    background: var(--bg-elevated) !important;
+}
+[data-testid="stChatInput"] button:disabled svg {
+    fill: var(--ink-soft) !important;
 }
 
 /* ---- Expander (response details) ---- */
-.streamlit-expanderHeader, [data-testid="stExpander"] summary {
+[data-testid="stExpander"] {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-panel);
+}
+[data-testid="stExpander"] summary {
+    background: var(--bg-panel) !important;
+}
+[data-testid="stExpander"] summary [data-testid="stMarkdownContainer"] p {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--ink-soft) !important;
+    margin: 0;
+}
+/* keep the chevron on its icon font — do not let the mono override above reach it */
+[data-testid="stExpander"] [data-testid="stIconMaterial"] {
+    font-family: 'Material Symbols Rounded' !important;
+    color: var(--ink-soft) !important;
+}
+[data-testid="stExpander"] [data-testid="stExpanderDetails"] p,
+[data-testid="stExpander"] [data-testid="stExpanderDetails"] span {
+    color: var(--ink) !important;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 13px;
-    color: var(--navy) !important;
-}
-[data-testid="stExpander"] {
-    border: 1px dashed var(--gold);
-    border-radius: 4px;
-    background: var(--parchment-card);
 }
 </style>
 """
@@ -277,7 +405,7 @@ def get_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-#Database Initializations
+#Database Initializations - DataBase Add
 def init_db():
 
     conn = get_connection()
@@ -397,8 +525,6 @@ def load_chat_messages(session_id):
 # =========================================================
 # CREATE LLM
 # =========================================================
-
-
 def create_llms(api_key):
     return ChatGroq(
         api_key=api_key,
@@ -406,11 +532,9 @@ def create_llms(api_key):
         temperature=0.7,
         max_retries=3,
     )
-
 # =========================================================
 # CREATE CHAINS
 # =========================================================
-
 def create_chains(api_key):
     llm = create_llms(api_key)
     system_prompt = """
@@ -439,8 +563,9 @@ You can help with topics such as:
 • Office Timings
 • College Rules
 • General College Information
-
+ 
 Instructions:
+ * if the user say who's mdae by you? who's make you? then simply answer SRKI AI assistant made by Saniya Patel,Diya Patel,Chandani Jagtiya --- become friendly responses...
 
 1. Always answer politely and professionally.
 
@@ -505,7 +630,7 @@ Do not provide any explanation about the unrelated topic.
 11. If someone asks for the SRKI website, provide:
 https://www.srki.ac.in
 
-12. If someone asks for the Saurashtra University syllabus, provide:
+12. If someone asks for the Shree Ram Krishna Institue University syllabus, provide:
 https://www.srki.ac.in/pages/su-syllabus/
 
 13. Always remain respectful, helpful, and student-friendly.
@@ -803,6 +928,8 @@ Specialization
 6. Do not swap or modify any field.
 7. Do not infer or rewrite titles.
 8. Preserve the exact spelling of every name.
+
+26-If the user asking who's made by like etc... youre Answer is Saniya Patel is made by  me 
 """
     chain = (
         ChatPromptTemplate.from_messages(
@@ -913,21 +1040,21 @@ with st.sidebar:
 
     _sidebar_seal_content = (
         LOGO_IMG_TAG if LOGO_IMG_TAG
-        else '<span style="font-family:\'Fraunces\',serif;font-weight:700;color:#1B2A4A;">S</span>'
+        else '<span style="font-family:\'Source Serif 4\',serif;font-weight:700;color:#C9A44C;">S</span>'
     )
 
     st.markdown(
         f"""
         <div style="display:flex;flex-direction:column;align-items:center;
                     text-align:center;margin-bottom:10px;">
-            <div style="width:56px;height:56px;border-radius:50%;background:#FFFFFF;
-                        border:2px solid #C9A44C;display:flex;align-items:center;
+            <div style="width:56px;height:56px;border-radius:50%;background:#131519;
+                        border:1px solid #C9A44C;display:flex;align-items:center;
                         justify-content:center;overflow:hidden;padding:2px;
                         box-sizing:border-box;margin-bottom:8px;">
                 {_sidebar_seal_content}
             </div>
-            <div style="font-family:'Fraunces',serif;font-size:19px;font-weight:700;
-                        line-height:1.2;color:#F7F2E7;">SRKI AI Assistant</div>
+            <div style="font-family:'Source Serif 4',serif;font-size:18px;font-weight:600;
+                        line-height:1.2;color:#ecedef;">SRKI AI Assistant</div>
         </div>
         """,
         unsafe_allow_html=True,
