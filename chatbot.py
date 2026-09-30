@@ -386,14 +386,24 @@ section[data-testid="stSidebar"] .stAlert {
     border-color: var(--gold-dim) !important;
     box-shadow: 0 4px 18px rgba(0, 0, 0, 0.30), 0 0 0 3px var(--gold-soft);
 }
-[data-testid="stChatInput"] textarea {
-    font-family: 'Inter', sans-serif;
-    color: var(--ink) !important;
+[data-testid="stChatInput"] textarea,
+[data-testid="stChatInput"] textarea:focus,
+[data-testid="stChatInput"] [data-baseweb="textarea"],
+[data-testid="stChatInput"] [data-baseweb="textarea"] textarea,
+[data-testid="stChatInput"] [data-baseweb="input"] input {
+    font-family: 'Inter', sans-serif !important;
+    color: #ecedef !important;
+    -webkit-text-fill-color: #ecedef !important;
     background: transparent !important;
     border: none !important;
+    box-shadow: none !important;
 }
-[data-testid="stChatInput"] textarea::placeholder {
-    color: var(--ink-soft) !important;
+[data-testid="stChatInput"] textarea::placeholder,
+[data-testid="stChatInput"] [data-baseweb="textarea"] textarea::placeholder,
+[data-testid="stChatInput"] input::placeholder {
+    color: #8f96a1 !important;
+    -webkit-text-fill-color: #8f96a1 !important;
+    opacity: 1 !important;
 }
 [data-testid="stChatInput"] button {
     background: var(--gold) !important;
