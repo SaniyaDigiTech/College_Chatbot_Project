@@ -3,7 +3,9 @@ import sqlite3
 import uuid
 import logging
 import base64
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 import streamlit as st
 from logging.handlers import RotatingFileHandler
 from langchain_groq import ChatGroq
@@ -20,21 +22,35 @@ from langchain_core.messages import (
     AIMessage,
 )
 
+# Automatically load environment variables from .env
+load_dotenv()
+
 DB_PATH = "srki.db"
 MODEL = "openai/gpt-oss-120b"
-LOGO_PATH = "srki logo.png"
+LOGO_PATH = "Assets/srki logo.png"
 
-# Streamlit configurations- confirmation of the Streamlit 
+# Setup rotating log handler
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+if not logger.handlers:
+    handler = RotatingFileHandler("app.log", maxBytes=1_000_000, backupCount=3)
+    formatter = logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
+# Retrieve Groq API key automatically from .env
+def get_groq_api_key():
+    return os.getenv("GROQ_API_KEY") or os.getenv("api_key") or ""
+
+# Streamlit page configurations
 st.set_page_config(
     page_title="SRKI AI Assistant",
     page_icon="🎓",
     layout="wide",
     initial_sidebar_state="expanded"
 )
-#  logo loading -Reads the images,converts into Base64,Catches it for Faster Loading 
-# Because the logo does not change ,so Streamlit loads it only once.
 
+# Logo loading - converts image into Base64 and caches it for fast loading
 @st.cache_data
 def get_logo_b64(path: str):
     p = Path(path)
@@ -42,14 +58,14 @@ def get_logo_b64(path: str):
         return None
     return base64.b64encode(p.read_bytes()).decode()
 
-
 LOGO_B64 = get_logo_b64(LOGO_PATH)
 LOGO_IMG_TAG = (
     f'<img src="data:image/png;base64,{LOGO_B64}" '
     f'style="width:100%;height:100%;object-fit:contain;">'
     if LOGO_B64 else None
 )
-#CSS
+
+# Custom Styling (Dark Gold Premium Theme with Green & Red Scope Accents)
 CUSTOM_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
@@ -149,28 +165,29 @@ h1, h2, h3, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
     width: 100%;
     background: linear-gradient(90deg, var(--gold) 0%, var(--border) 40%, transparent 100%);
     margin-top: -18px;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
-.srki-chips {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 22px;
+
+/* ---- Quick Interactive Chip Buttons ---- */
+div[data-testid="stColumn"] .stButton > button {
+    background: var(--bg-panel) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--ink-soft) !important;
+    border-radius: 20px !important;
+    padding: 5px 12px !important;
+    font-size: 12.5px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500 !important;
+    width: 100% !important;
+    transition: all 0.15s ease !important;
+    height: auto !important;
+    min-height: 0 !important;
+    box-shadow: none !important;
 }
-.srki-chip {
-    font-family: 'Inter', sans-serif;
-    font-size: 12.5px;
-    font-weight: 500;
-    color: var(--ink-soft);
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 5px 13px;
-    transition: border-color 0.15s ease, color 0.15s ease;
-}
-.srki-chip:hover {
-    border-color: var(--gold);
-    color: var(--gold);
+div[data-testid="stColumn"] .stButton > button:hover {
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+    background: var(--gold-soft) !important;
 }
 
 /* ---- Sidebar ---- */
@@ -202,49 +219,63 @@ section[data-testid="stSidebar"] .stCaption, section[data-testid="stSidebar"] sm
 section[data-testid="stSidebar"] hr {
     border-color: var(--border);
 }
-section[data-testid="stSidebar"] [data-testid="stTextInputRootElement"] {
-    background: var(--bg-elevated) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 8px !important;
-    box-shadow: none !important;
-    transition: border-color 0.15s ease;
-}
-section[data-testid="stSidebar"] [data-testid="stTextInputRootElement"]:focus-within {
-    border-color: var(--gold) !important;
-}
-section[data-testid="stSidebar"] [data-testid="stTextInputRootElement"] input {
-    background: transparent !important;
-    color: var(--ink) !important;
-    font-family: 'Inter', sans-serif;
-}
-section[data-testid="stSidebar"] [data-testid="stTextInputRootElement"] button {
-    background: transparent !important;
-}
-section[data-testid="stSidebar"] [data-testid="stTextInputRootElement"] [data-testid="stIconMaterial"] {
-    font-family: 'Material Symbols Rounded' !important;
-    color: var(--ink-soft) !important;
-}
-section[data-testid="stSidebar"] .stCodeBlock,
-section[data-testid="stSidebar"] code {
-    font-family: 'IBM Plex Mono', monospace !important;
-    background: var(--bg-elevated) !important;
-    border: 1px solid var(--border);
-}
 section[data-testid="stSidebar"] .stButton button {
-    background: var(--gold);
-    color: #000000 important;
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    transition: background 0.15s ease;
+    background: var(--gold) !important;
+    color: #000000 !important;
+    font-weight: 600 !important;
+    border: none !important;
+    border-radius: 8px !important;
+    transition: background 0.15s ease !important;
 }
 section[data-testid="stSidebar"] .stButton button:hover {
-    background: #ddb95f;
+    background: #ddb95f !important;
 }
 section[data-testid="stSidebar"] .stAlert {
     background: var(--bg-elevated) !important;
     border: 1px solid var(--border);
     border-radius: 8px;
+}
+
+/* ---- Green Accent Card for In-Scope SRKI Responses ---- */
+.srki-badge-green {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(48, 209, 88, 0.12);
+    color: #30d158;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    border: 1px solid rgba(48, 209, 88, 0.3);
+    font-family: 'Inter', sans-serif;
+}
+
+/* ---- Red Accent Card for Out-of-Scope Responses ---- */
+.srki-badge-red {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 69, 58, 0.12);
+    color: #ff453a;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    border: 1px solid rgba(255, 69, 58, 0.3);
+    font-family: 'Inter', sans-serif;
+}
+.srki-card-out {
+    background: rgba(225, 29, 72, 0.08) !important;
+    border: 1px solid rgba(255, 69, 58, 0.25) !important;
+    border-left: 4px solid #ff453a !important;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    color: #fecdd3 !important;
 }
 
 /* ---- Alerts (main area) ---- */
@@ -318,7 +349,7 @@ section[data-testid="stSidebar"] .stAlert {
     border-radius: 4px;
 }
 
-/* ---- Chat input: soft rounded pill, minimal border, quiet by default ---- */
+/* ---- Chat input ---- */
 [data-testid="stChatInput"] {
     border-top: none;
     background: var(--bg);
@@ -381,7 +412,6 @@ section[data-testid="stSidebar"] .stAlert {
     color: var(--ink-soft) !important;
     margin: 0;
 }
-/* keep the chevron on its icon font — do not let the mono override above reach it */
 [data-testid="stExpander"] [data-testid="stIconMaterial"] {
     font-family: 'Material Symbols Rounded' !important;
     color: var(--ink-soft) !important;
@@ -395,47 +425,42 @@ section[data-testid="stSidebar"] .stAlert {
 </style>
 """
 
-st.markdown(CUSTOM_CSS, unsafe_allow_html=True)  #CSS End here..
+st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
-logger = logging.getLogger(__name__)    #Create a logger to records error,request,response time -- Useful for debugging
-
-#Database connections
+# Database connections
 def get_connection():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
-#Database Initializations - DataBase Add
+# Database Initialization
 def init_db():
-
     conn = get_connection()
     conn.executescript(
         """
         CREATE TABLE IF NOT EXISTS conversation_memory(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    session_id TEXT,
-    role TEXT,
-    content TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT,
+            role TEXT,
+            content TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
 
         CREATE TABLE IF NOT EXISTS feedback(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    session_id TEXT,
-    rating INTEGER,
-    feedback TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-"""
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT,
+            rating INTEGER,
+            feedback TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """
     )
-
     conn.commit()
     conn.close()
 
-#whenever the user and ai sends a message it inserts into sqlite
+# Insert message into SQLite
 def save_message(session_id, role, content):
     conn = get_connection()
-
     conn.execute(
         """
         INSERT INTO conversation_memory(
@@ -451,15 +476,12 @@ def save_message(session_id, role, content):
             content,
         ),
     )
-
     conn.commit()
     conn.close()
 
-#Read previous conversations and convert database rows into humanmessage,aimessage
+# Load history for LangChain context
 def load_history(session_id):
-
     conn = get_connection()
-
     rows = conn.execute(
         """
         SELECT role, content
@@ -469,35 +491,35 @@ def load_history(session_id):
         """,
         (session_id,),
     ).fetchall()
-
     conn.close()
 
     history = []
-
     for row in rows:
-
+        # Strip internal tags before sending back to LLM context
+        clean_content = row["content"].replace("[IN_SCOPE]", "").replace("[OUT_OF_SCOPE]", "").strip()
         if row["role"] == "user":
-
-            history.append(
-                HumanMessage(
-                    content=row["content"]
-                )
-            )
-
+            history.append(HumanMessage(content=clean_content))
         else:
-
-            history.append(
-                AIMessage(
-                    content=row["content"]
-                )
-            )
+            history.append(AIMessage(content=clean_content))
 
     return history
 
+# Determine scope helper function
+def determine_scope(content: str) -> str:
+    lower = content.lower()
+    if (
+        "[out_of_scope]" in lower
+        or "out_of_scope" in lower
+        or "sorry, i can only assist" in lower
+        or "oops!" in lower
+        or "brain is 100%" in lower
+        or "can't assist with that topic" in lower
+        or "unrelated to srki" in lower
+    ):
+        return "out"
+    return "in"
 
-# =========================================================
-# LOAD CHAT HISTORY FOR STREAMLIT UI
-# =========================================================
+# Load messages for Streamlit UI
 def load_chat_messages(session_id):
     conn = get_connection()
     rows = conn.execute(
@@ -510,21 +532,19 @@ def load_chat_messages(session_id):
         (session_id,),
     ).fetchall()
     conn.close()
-    messages = []
 
+    messages = []
     for row in rows:
-        messages.append(
-            {
-                "role": row["role"],
-                "content": row["content"],
-            }
-        )
+        scope = determine_scope(row["content"])
+        messages.append({
+            "role": row["role"],
+            "content": row["content"],
+            "scope": scope,
+        })
 
     return messages
 
-# =========================================================
-# CREATE LLM
-# =========================================================
+# Create LLM instance
 def create_llms(api_key):
     return ChatGroq(
         api_key=api_key,
@@ -532,17 +552,16 @@ def create_llms(api_key):
         temperature=0.7,
         max_retries=3,
     )
-# =========================================================
-# CREATE CHAINS
-# =========================================================
+
+# Create LangChain Chain
 def create_chains(api_key):
     llm = create_llms(api_key)
     system_prompt = """
-You are SRKI AI Assistant, an intelligent virtual assistant for
+You are SRKI AI Assistant, an intelligent, helpful, and friendly virtual assistant for
 Shree Ramkrishna Institute of Computer Education and Applied Sciences (SRKI).
 
 Your primary responsibility is to assist students, parents, faculty, and visitors
-by answering questions related to SRKI in a clear, accurate, and professional manner.
+by answering questions related to SRKI in a clear, attractive, accurate, and student-friendly manner.
 
 You can help with topics such as:
 
@@ -567,46 +586,28 @@ You can help with topics such as:
 Instructions:
  * if the user say who's mdae by you? who's make you? then simply answer SRKI AI assistant made by Saniya Patel,Diya Patel,Chandani Jagtiya --- become friendly responses...
 
-1. Always answer politely and professionally.
+1. Always answer politely, warmly, and professionally with friendly emojis!
 
-2. Keep responses short, clear, and easy to understand.
+2. Keep responses short, clear, attractive, and easy to understand for students.
 
 3. Use bullet points whenever appropriate.
 
 4. If the user greets you, respond warmly and introduce yourself as the SRKI AI Assistant.
 
-5. Scope of the Assistant
+5. Scope of the Assistant & Tagging:
 
-You are strictly an SRKI AI Assistant.
+You are strictly an SRKI AI Assistant. Your responsibility is ONLY to answer questions related to Shree Ramkrishna Institute of Computer Education and Applied Sciences (SRKI).
 
-Your responsibility is ONLY to answer questions related to Shree Ramkrishna Institute of Computer Education and Applied Sciences (SRKI).
+IMPORTANT: You MUST prefix your response with either `[IN_SCOPE]` or `[OUT_OF_SCOPE]`:
 
-If the user asks any question that is NOT related to SRKI, politely decline and explain that your purpose is to assist only with SRKI-related information.
+- If the question IS related to SRKI (admissions, courses, syllabus, faculty, fees, examinations, placements, campus facilities, academic calendar, contact, rules, etc.):
+  Start your response with `[IN_SCOPE]`. Provide a clear, attractive, student-friendly answer with relevant emojis.
 
-For example, if the user asks about:
+- If the question is NOT related to SRKI (e.g. Python, Java, C++, AI, APIs, Machine Learning, Mathematics, Movies, Recipes, Politics, Sports, General Knowledge, Programming, Technology, or any topic unrelated to SRKI):
+  Start your response with `[OUT_OF_SCOPE]`. Reply in a polite, friendly, and slightly funny/playful student-friendly tone like this:
+  "[OUT_OF_SCOPE] 🤖 Oops! My AI brain is 100% powered only for SRKI College topics! I can't assist with that topic, but ask me anything about SRKI admissions, syllabus, fees, faculty, campus, or exams! 🎓"
 
-- Python
-- Java
-- C++
-- Artificial Intelligence
-- APIs
-- Machine Learning
-- Mathematics
-- Movies
-- Recipes
-- Politics
-- Sports
-- General Knowledge
-- Programming
-- Technology
-- Any topic unrelated to SRKI
-
-Always reply in a friendly and professional manner like this:
-
-"Sorry, I can only assist with information related to Shree Ramkrishna Institute (SRKI). Please ask me about admissions, courses, syllabus, faculty, fees, examinations, placements, campus facilities, academic calendar, or any other SRKI-related topic."
-
-Do not answer the unrelated question.
-Do not provide any explanation about the unrelated topic.
+Do not answer any unrelated topic.
 
 6. If you are not confident about SRKI-specific information, clearly say:
 
@@ -631,7 +632,7 @@ Do not provide any explanation about the unrelated topic.
 https://www.srki.ac.in
 
 12. If someone asks for the Shree Ram Krishna Institue University syllabus, provide:
-https://www.srki.ac.in/pages/su-syllabus/
+https://www.srki.ac.in/pages/syllabus/
 
 13. Always remain respectful, helpful, and student-friendly.
 
@@ -659,6 +660,7 @@ Always include the direct URL in your response whenever available.
 • Do NOT send the general syllabus page if a direct PDF exists.
 • Mention the semester, course and academic year clearly.
 
+if the user tell i want to admision in that sem and 1,2,4,3,5,6 sem so first the answer like which year would you like to admisions in 2025-2026 year like that asking first and then give the link for the correct year whatever the user tell ...
 Example:
 
 User:
@@ -680,7 +682,6 @@ Assistant:
 
 Here is the official B.Sc. IT Semester 6 syllabus (2025–2026):
 
-<Direct PDF Link>
 
 Click the link to download the PDF.
 
@@ -797,10 +798,10 @@ and clearly state that no semester-specific PDF could be found.
 
 First the asking which number regarding the admin office,institue regarding like that 
 
-20- If the user want to know  the Address they rediret with the google map and the local address is M.T.B College Campus, B/h P.T Science College, Opp.Chowpati,
+20- If the user want to know the Address they rediret with the google map and the local address is M.T.B College Campus, B/h P.T Science College, Opp.Chowpati,
 Athwalines, Surat-395001 Gujarat, India.
 
-21-If the user want to know the HOD/Principal name  in Computer Science Departement  so you reply them with the name of *Mr. Jayesh Arvindlal Pushtiwala* and if the user want to who is hod in computer science so resopnse are Mr. Jayesh Arvindlal Pushtiwala and he is MCA, NET(Computer Science)
+21-If the user want to know the HOD/Principal name in Computer Science Departement so you reply them with the name of *Mr. Jayesh Arvindlal Pushtiwala* and if the user want to who is hod in computer science so resopnse are Mr. Jayesh Arvindlal Pushtiwala and he is MCA, NET(Computer Science)
 Head of department With the new advancements in the field of computers and in a time when there is a boom in the IT industry, the Sarvajanik Education Society introduced B.Sc. (Computer Science), a three year undergraduate course for the tech-savvy youth. Since the inception of this college the department of computer science has been in to existence i.e. from the year 1999. The course provides rigorous foundations of the concepts of Computer Science and Information Technology. In the final year, students also get an opportunity to do project work. Hence the combination of the concepts and training of software tools equip the students to adapt to ever-changing technology.In 2010, the department started offering a two years, post graduation level degree course, M.Sc. (Computer Application). The college is contributing in its own inimitable way to the development of Computer science by offering the courses with the help of efficient and highly qualified teachers and through a well-equipped computer lab.Every year the department is conducting various competitions like software programming, seminar and poster competitions for UG and PG students.
 
 22. If the user asks about the faculty members of the Computer Science Department, always present the information in a table with the following columns:
@@ -940,104 +941,103 @@ Specialization
             ]
         )
         | llm
-        | StrOutputParser()
     )
 
     return chain
 
-
-# =========================================================
-# GENERATE AI RESPONSE
-# =========================================================
-
-def generate_response(
-    session_id,
-    user_message,
-    api_key,
-):
-
+# Generate AI Response Stream Generator for real-time fast streaming
+def generate_response_stream(session_id, user_message, api_key):
     request_id = str(uuid.uuid4())[:8]
-
-    logger.info(
-        f"[{request_id}] -> Chat request | session={session_id}"
-    )
+    logger.info(f"[{request_id}] -> Chat request | session={session_id}")
 
     history = load_history(session_id)
+    chain = create_chains(api_key)
 
-    chain = create_chains(api_key) # Create llm
+    start_time = time.time()
 
-    start = time.time()
+    def stream_gen():
+        for chunk in chain.stream({"input": user_message, "history": history}):
+            if isinstance(chunk, str):
+                yield chunk
+            elif hasattr(chunk, "content"):
+                yield chunk.content
 
-    reply = chain.invoke(
-        {
-            "input": user_message,
-            "history": history,
-        }
+    return stream_gen, start_time, request_id
+
+# Parse scope prefix from real-time stream generator with multi-chunk buffer
+def parse_scope_from_stream(raw_stream_func):
+    peek_chunks = []
+    iterator = iter(raw_stream_func())
+    
+    accumulated_text = ""
+    for chunk in iterator:
+        text = chunk if isinstance(chunk, str) else getattr(chunk, "content", "")
+        peek_chunks.append(text)
+        accumulated_text += text
+        if "]" in accumulated_text or len(accumulated_text) >= 40:
+            break
+
+    lower_acc = accumulated_text.lower()
+    if (
+        "[out_of_scope]" in lower_acc
+        or "out_of_scope" in lower_acc
+        or "sorry, i can only assist" in lower_acc
+        or "oops!" in lower_acc
+        or "brain is 100%" in lower_acc
+        or "can't assist with that topic" in lower_acc
+    ):
+        scope = "out"
+    else:
+        scope = "in"
+
+    full_peek = "".join(peek_chunks)
+    clean_peek = (
+        full_peek
+        .replace("[OUT_OF_SCOPE]", "")
+        .replace("[IN_SCOPE]", "")
+        .replace("out_of_scope", "")
+        .replace("in_scope", "")
+        .lstrip()
     )
 
-    duration = (time.time() - start) * 1000
+    def clean_generator():
+        if clean_peek:
+            yield clean_peek
+        for chunk in iterator:
+            text = chunk if isinstance(chunk, str) else getattr(chunk, "content", "")
+            text = text.replace("[OUT_OF_SCOPE]", "").replace("[IN_SCOPE]", "")
+            if text:
+                yield text
 
-    save_message(
-        session_id,
-        "user",
-        user_message,
-    )
-
-    save_message(
-        session_id,
-        "assistant",
-        reply,
-    )
-
-    logger.info(
-        f"[{request_id}] <- Completed | {duration:.0f}ms"
-    )
-
-    return {
-        "reply": reply,
-        "duration": round(duration, 2),
-        "request_id": request_id,
-    }
+    return scope, clean_generator()
 
 
+# Initialize Database
 init_db()
 
+# Retrieve API Key from .env
+groq_api_key = get_groq_api_key()
 
 if "session_id" not in st.session_state:
-
-    st.session_state.session_id = str(
-        uuid.uuid4()
-    )
-
+    st.session_state.session_id = str(uuid.uuid4())
 
 if "messages" not in st.session_state:
+    st.session_state.messages = load_chat_messages(st.session_state.session_id)
 
-    st.session_state.messages = (
-        load_chat_messages(
-            st.session_state.session_id
-        )
-    )
+if "pending_prompt" not in st.session_state:
+    st.session_state.pending_prompt = None
 
-
-# =========================================================
-# NEW CHAT FUNCTION
-# =========================================================
-
+# New Chat Handler
 def new_chat():
-
-    st.session_state.session_id = str(
-        uuid.uuid4()
-    )
-
+    st.session_state.session_id = str(uuid.uuid4())
     st.session_state.messages = []
+    st.session_state.pending_prompt = None
 
 
 # =========================================================
 # SIDEBAR — "Registrar's Desk"
 # =========================================================
-
 with st.sidebar:
-
     _sidebar_seal_content = (
         LOGO_IMG_TAG if LOGO_IMG_TAG
         else '<span style="font-family:\'Source Serif 4\',serif;font-weight:700;color:#C9A44C;">S</span>'
@@ -1046,7 +1046,7 @@ with st.sidebar:
     st.markdown(
         f"""
         <div style="display:flex;flex-direction:column;align-items:center;
-                    text-align:center;margin-bottom:10px;">
+                    text-align:center;margin-bottom:14px;">
             <div style="width:56px;height:56px;border-radius:50%;background:#131519;
                         border:1px solid #C9A44C;display:flex;align-items:center;
                         justify-content:center;overflow:hidden;padding:2px;
@@ -1055,77 +1055,30 @@ with st.sidebar:
             </div>
             <div style="font-family:'Source Serif 4',serif;font-size:18px;font-weight:600;
                         line-height:1.2;color:#ecedef;">SRKI AI Assistant</div>
+            <div style="font-size:12px;color:#8f96a1;margin-top:4px;">
+                {"🟢 Online & Ready" if groq_api_key else "🔴 Missing API Key in .env"}
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    st.caption(
-        "Enter your Groq API key to start chatting with SRKI Information."
-    )
-
-    # -----------------------------------------------------
-    # API KEY INPUT
-    # -----------------------------------------------------
-
-    groq_api_key = st.text_input(
-        "Groq API Key",
-        type="password",
-        placeholder="gsk_...",
-        help="Your Groq API key is used to communicate with the Groq API.",
-    )
-
-    if groq_api_key:
-
-        st.success(
-            "API Key Added"
-        )
-
-    else:
-
-        st.warning(
-            "API Key Required"
-        )
+    st.caption("Student Information Portal for Shree Ramkrishna Institute.")
 
     st.divider()
 
-    # -----------------------------------------------------
-    # CHAT ID
-    # -----------------------------------------------------
-
-    # st.caption(
-    #     "Current Chat ID"
-    # )
-
-    # st.code(
-    #     st.session_state.session_id,
-    #     language=None,
-    # )
-
-    # -----------------------------------------------------
-    # NEW CHAT
-    # -----------------------------------------------------
-
-    if st.button(
-        "➕ New Chat",
-        use_container_width=True,
-    ):
-
+    if st.button("➕ New Chat", use_container_width=True):
         new_chat()
-
         st.rerun()
 
     st.divider()
 
-    st.caption(
-        f"Model: {MODEL}"
-    )
+    st.caption(f"Model: {MODEL}")
 
 
 # =========================================================
-# MAIN UI — Masthead
+# MAIN UI — Masthead & Interactive Chips
 # =========================================================
-
 st.markdown(
     f"""
     <div class="srki-masthead">
@@ -1140,120 +1093,130 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown(
-    """
-    <div class="srki-chips">
-        <span class="srki-chip">📖 Syllabus</span>
-        <span class="srki-chip">🎓 Admission</span>
-        <span class="srki-chip">💰 Fees</span>
-        <span class="srki-chip">🏛️ Faculty</span>
-        <span class="srki-chip">📍 Contact</span>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+# Interactive Quick Suggestion Chip Buttons for Students
+col1, col2, col3, col4, col5 = st.columns(5)
+if col1.button("📖 Syllabus"):
+    st.session_state.pending_prompt = "Tell me about SRKI Syllabus"
+if col2.button("🎓 Admission"):
+    st.session_state.pending_prompt = "What are the admission process and details?"
+if col3.button("💰 Fees"):
+    st.session_state.pending_prompt = "What is the Fee Structure of SRKI?"
+if col4.button("🏛️ Faculty"):
+    st.session_state.pending_prompt = "Show me the Computer Science Department faculty list"
+if col5.button("📍 Contact"):
+    st.session_state.pending_prompt = "Provide SRKI contact numbers, email, and address"
 
-
+# Admin configuration warning if .env key is missing
 if not groq_api_key:
-
-    st.info(
-        "👈 Enter your Groq API key in the sidebar "
-        "to start chatting."
+    st.error(
+        "⚠️ **API Key Missing**: Please set `api_key` or `GROQ_API_KEY` in your `.env` file to enable the assistant for students."
     )
 
-
+# Render Chat History
 for message in st.session_state.messages:
-
     avatar = "🧑🏻" if message["role"] == "user" else "🎓"
+    with st.chat_message(message["role"], avatar=avatar):
+        if message["role"] == "assistant":
+            scope = message.get("scope") or determine_scope(message["content"])
+            clean_content = (
+                message["content"]
+                .replace("[IN_SCOPE]", "")
+                .replace("[OUT_OF_SCOPE]", "")
+                .replace("out_of_scope", "")
+                .replace("in_scope", "")
+                .strip()
+            )
+            if scope == "out":
+                st.markdown(
+                    f"""<div class="srki-badge-red">🔴 Out of Scope Question</div>""",
+                    unsafe_allow_html=True,
+                )
+                st.markdown(
+                    f"""<div class="srki-card-out">{clean_content}</div>""",
+                    unsafe_allow_html=True,
+                )
+            else:
+                st.markdown(
+                    f"""<div class="srki-badge-green">🟢 SRKI Official Info</div>""",
+                    unsafe_allow_html=True,
+                )
+                st.markdown(clean_content)
+        else:
+            st.markdown(message["content"])
 
-    with st.chat_message(
-        message["role"],
-        avatar=avatar,
-    ):
+# Handle standard chat input
+chat_input_val = st.chat_input("Ask me anything about SRKI...", disabled=not bool(groq_api_key))
 
-        st.markdown(
-            message["content"]
-        )
+# Determine active prompt (either typed input or chip button clicked)
+active_prompt = None
+if chat_input_val:
+    active_prompt = chat_input_val
+elif st.session_state.pending_prompt:
+    active_prompt = st.session_state.pending_prompt
+    st.session_state.pending_prompt = None
 
-
-prompt = st.chat_input(
-    "Ask me anything...",
-    disabled=not bool(groq_api_key),
-)
-
-
-if prompt:
-
-    st.session_state.messages.append(
-        {
-            "role": "user",
-            "content": prompt,
-        }
-    )
+if active_prompt:
+    st.session_state.messages.append({
+        "role": "user",
+        "content": active_prompt,
+    })
 
     with st.chat_message("user", avatar="🧑‍🎓"):
-
-        st.markdown(prompt)
+        st.markdown(active_prompt)
 
     with st.chat_message("assistant", avatar="🎓"):
+        try:
+            raw_stream_gen, start_time, request_id = generate_response_stream(
+                st.session_state.session_id,
+                active_prompt,
+                groq_api_key,
+            )
 
-        with st.spinner(
-            "Thinking..."
-        ):
+            scope, clean_stream = parse_scope_from_stream(raw_stream_gen)
 
-            try:
-
-                result = generate_response(
-                    st.session_state.session_id,
-                    prompt,
-                    groq_api_key,
+            if scope == "out":
+                st.markdown(
+                    f"""<div class="srki-badge-red">🔴 Out of Scope Question</div>""",
+                    unsafe_allow_html=True,
+                )
+            else:
+                st.markdown(
+                    f"""<div class="srki-badge-green">🟢 SRKI Official Info</div>""",
+                    unsafe_allow_html=True,
                 )
 
-                answer = result["reply"]
+            # Real-time streaming response playback
+            answer = st.write_stream(clean_stream)
 
-                st.markdown(answer)
+            # Strip any internal tags from final answer string before saving
+            clean_answer = (
+                answer
+                .replace("[OUT_OF_SCOPE]", "")
+                .replace("[IN_SCOPE]", "")
+                .strip()
+            )
 
-                st.session_state.messages.append(
-                    {
-                        "role": "assistant",
-                        "content": answer,
-                    }
-                )
+            duration = round((time.time() - start_time) * 1000, 2)
 
-                with st.expander(
-                    "⚙️ Response Details"
-                ):
+            save_message(st.session_state.session_id, "user", active_prompt)
+            save_message(st.session_state.session_id, "assistant", clean_answer)
 
-                    st.write(
-                        "Request ID:",
-                        result["request_id"],
-                    )
+            st.session_state.messages.append({
+                "role": "assistant",
+                "content": clean_answer,
+                "scope": scope,
+            })
 
-                    st.write(
-                        "Session ID:",
-                        st.session_state.session_id,
-                    )
+            logger.info(f"[{request_id}] <- Completed | {duration:.0f}ms")
 
-                    st.write(
-                        "Model:",
-                        MODEL,
-                    )
+            with st.expander("⚙️ Response Details"):
+                st.write("Request ID:", request_id)
+                st.write("Session ID:", st.session_state.session_id)
+                st.write("Model:", MODEL)
+                st.write("Scope:", "🟢 In-Scope (SRKI)" if scope == "in" else "🔴 Out-of-Scope")
+                st.write("Duration:", f"{duration} ms")
 
-                    st.write(
-                        "Duration:",
-                        f'{result["duration"]} ms',
-                    )
-
-            except Exception as error:
-
-                logger.exception(
-                    "Chat generation failed"
-                )
-
-                st.error(
-                    "Unable to generate response."
-                )
-
-                st.error(
-                    str(error)
-                )
+        except Exception as error:
+            logger.exception("Chat generation failed")
+            st.error("Unable to generate response.")
+            st.error(str(error))
