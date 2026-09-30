@@ -5,7 +5,6 @@ import logging
 import base64
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 import streamlit as st
 from logging.handlers import RotatingFileHandler
 from langchain_groq import ChatGroq
@@ -22,8 +21,11 @@ from langchain_core.messages import (
     AIMessage,
 )
 
-# Automatically load environment variables from .env
-load_dotenv()
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 DB_PATH = "srki.db"
 MODEL = "openai/gpt-oss-120b"
@@ -38,8 +40,18 @@ if not logger.handlers:
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
-# Retrieve Groq API key automatically from .env
+# Retrieve Groq API key automatically from Streamlit Secrets or .env
 def get_groq_api_key():
+    # 1. Check Streamlit Cloud Secrets (for deployment)
+    try:
+        if "GROQ_API_KEY" in st.secrets and st.secrets["GROQ_API_KEY"]:
+            return st.secrets["GROQ_API_KEY"]
+        if "api_key" in st.secrets and st.secrets["api_key"]:
+            return st.secrets["api_key"]
+    except Exception:
+        pass
+
+    # 2. Check local environment / .env file
     return os.getenv("GROQ_API_KEY") or os.getenv("api_key") or ""
 
 # Streamlit page configurations
