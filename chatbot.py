@@ -29,7 +29,7 @@ except ImportError:
 
 DB_PATH = "srki.db"
 MODEL = "openai/gpt-oss-120b"
-LOGO_PATH = "srki logo.png"
+LOGO_PATH = "Assets/srki logo.png"
 
 # Setup rotating log handler
 logger = logging.getLogger(__name__)
@@ -371,47 +371,56 @@ section[data-testid="stSidebar"] .stAlert {
 /* ---- Chat input ---- */
 [data-testid="stChatInput"] {
     border-top: none;
-    background: var(--bg);
+    background: var(--bg) !important;
     padding: 10px 0 6px 0;
 }
-[data-testid="stChatInput"] > div {
-    background: var(--bg-panel) !important;
+[data-testid="stChatInput"] > div,
+[data-testid="stChatInput"] [data-baseweb="base-input"],
+[data-testid="stChatInput"] [data-baseweb="textarea"] {
+    background-color: #131519 !important;
+    background: #131519 !important;
     border: 1px solid var(--border-soft) !important;
     border-radius: 28px !important;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.30);
-    padding-left: 8px !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.30) !important;
     transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
-[data-testid="stChatInput"]:focus-within > div {
+[data-testid="stChatInput"]:focus-within > div,
+[data-testid="stChatInput"]:focus-within [data-baseweb="base-input"],
+[data-testid="stChatInput"]:focus-within [data-baseweb="textarea"] {
     border-color: var(--gold-dim) !important;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.30), 0 0 0 3px var(--gold-soft);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.30), 0 0 0 2px var(--gold-soft) !important;
 }
+
 [data-testid="stChatInput"] textarea,
-[data-testid="stChatInput"] textarea:focus,
-[data-testid="stChatInput"] [data-baseweb="textarea"],
+[data-testid="stChatInput"] input,
 [data-testid="stChatInput"] [data-baseweb="textarea"] textarea,
-[data-testid="stChatInput"] [data-baseweb="input"] input {
-    font-family: 'Inter', sans-serif !important;
-    color: #ecedef !important;
-    -webkit-text-fill-color: #ecedef !important;
+[data-testid="stChatInput"] [data-baseweb="base-input"] input {
+    background-color: transparent !important;
     background: transparent !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 14px !important;
     border: none !important;
     box-shadow: none !important;
 }
+
 [data-testid="stChatInput"] textarea::placeholder,
-[data-testid="stChatInput"] [data-baseweb="textarea"] textarea::placeholder,
-[data-testid="stChatInput"] input::placeholder {
+[data-testid="stChatInput"] input::placeholder,
+[data-testid="stChatInput"] [data-baseweb="textarea"] textarea::placeholder {
     color: #8f96a1 !important;
     -webkit-text-fill-color: #8f96a1 !important;
     opacity: 1 !important;
 }
+
 [data-testid="stChatInput"] button {
     background: var(--gold) !important;
     border-radius: 50% !important;
     width: 34px !important;
     height: 34px !important;
     margin-right: 6px !important;
-    transition: background 0.15s ease;
+    transition: background 0.15s ease !important;
+    border: none !important;
 }
 [data-testid="stChatInput"] button:hover:not(:disabled) {
     background: #ddb95f !important;
@@ -1243,3 +1252,4 @@ if active_prompt:
             logger.exception("Chat generation failed")
             st.error("Unable to generate response.")
             st.error(str(error))
+            
