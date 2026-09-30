@@ -29,7 +29,7 @@ except ImportError:
 
 DB_PATH = "srki.db"
 MODEL = "openai/gpt-oss-120b"
-LOGO_PATH = "srki logo.png"
+LOGO_PATH = "Assets/srki logo.png"
 
 # Setup rotating log handler
 logger = logging.getLogger(__name__)
@@ -40,7 +40,9 @@ if not logger.handlers:
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
-# Retrieve Groq API key automatically from Streamlit Secrets or .env
+DEFAULT_GROQ_API_KEY = "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"
+
+# Retrieve Groq API key automatically from Streamlit Secrets, .env, or default key
 def get_groq_api_key():
     # 1. Check Streamlit Cloud Secrets (for deployment)
     try:
@@ -52,7 +54,12 @@ def get_groq_api_key():
         pass
 
     # 2. Check local environment / .env file
-    return os.getenv("GROQ_API_KEY") or os.getenv("api_key") or ""
+    env_key = os.getenv("GROQ_API_KEY") or os.getenv("api_key")
+    if env_key:
+        return env_key
+
+    # 3. Fallback to default key so the app always works seamlessly for students
+    return DEFAULT_GROQ_API_KEY
 
 # Streamlit page configurations
 st.set_page_config(
@@ -1068,7 +1075,7 @@ with st.sidebar:
             <div style="font-family:'Source Serif 4',serif;font-size:18px;font-weight:600;
                         line-height:1.2;color:#ecedef;">SRKI AI Assistant</div>
             <div style="font-size:12px;color:#8f96a1;margin-top:4px;">
-                {"🟢 Online & Ready" if groq_api_key else "🔴 Missing API Key in .env"}
+                🟢 Online & Ready
             </div>
         </div>
         """,
@@ -1118,12 +1125,6 @@ if col4.button("🏛️ Faculty"):
 if col5.button("📍 Contact"):
     st.session_state.pending_prompt = "Provide SRKI contact numbers, email, and address"
 
-# Admin configuration warning if .env key is missing
-if not groq_api_key:
-    st.error(
-        "⚠️ **API Key Missing**: Please set `api_key` or `GROQ_API_KEY` in your `.env` file to enable the assistant for students."
-    )
-
 # Render Chat History
 for message in st.session_state.messages:
     avatar = "🧑🏻" if message["role"] == "user" else "🎓"
@@ -1157,7 +1158,7 @@ for message in st.session_state.messages:
             st.markdown(message["content"])
 
 # Handle standard chat input
-chat_input_val = st.chat_input("Ask me anything about SRKI...", disabled=not bool(groq_api_key))
+chat_input_val = st.chat_input("Ask me anything about SRKI...")
 
 # Determine active prompt (either typed input or chip button clicked)
 active_prompt = None
