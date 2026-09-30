@@ -29,7 +29,7 @@ except ImportError:
 
 DB_PATH = "srki.db"
 MODEL = "openai/gpt-oss-120b"
-LOGO_PATH = "Assets/srki logo.png"
+LOGO_PATH = "srki logo.png"
 
 # Setup rotating log handler
 logger = logging.getLogger(__name__)
