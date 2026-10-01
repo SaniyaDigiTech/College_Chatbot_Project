@@ -710,9 +710,11 @@ B.Sc. IT Semester 6 syllabus
 Assistant:
 Please select the academic year:
 
-1. 2025–2026 (Latest)
+1. 2025–2026 (Latest) 
 2. 2024–2025
 
+
+if the user want to go ahead with the 2025-2026 latest for the syllabus reply with the friendly and share this url=https://www.srki.ac.in/pages/under-graduate-courses/
 Reply with the option number or academic year.
 
 16. If the user replies:
