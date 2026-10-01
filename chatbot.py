@@ -1208,12 +1208,12 @@ if active_prompt:
 
             if scope == "out":
                 st.markdown(
-                    f"""<div class="srki-badge-red">🔴 Out of Scope Question</div>""",
+                    f"""<div class="srki-badge-red"> 😈Out of Scope Question</div>""",
                     unsafe_allow_html=True,
                 )
             else:
                 st.markdown(
-                    f"""<div class="srki-badge-green">🟢 SRKI Official Info</div>""",
+                    f"""<div class="srki-badge-green">⭐ SRKI Official Info</div>""",
                     unsafe_allow_html=True,
                 )
 
