@@ -40,26 +40,15 @@ if not logger.handlers:
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
+# =========================================================
+# GROQ API KEY
+# =========================================================
+# Static key: the app will use this key automatically.
+# No API-key input is required from users.
 GROQ_API_KEY = "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"
 
-# Retrieve Groq API key automatically from Streamlit Secrets, .env, or default key
 def get_groq_api_key():
-    # 1. Check Streamlit Cloud Secrets (for deployment)
-    try:
-        if "GROQ_API_KEY" in st.secrets and st.secrets["GROQ_API_KEY"]:
-            return st.secrets["GROQ_API_KEY"]
-        if "api_key" in st.secrets and st.secrets["api_key"]:
-            return st.secrets["api_key"]
-    except Exception:
-        pass
-
-    # 2. Check local environment / .env file
-    env_key = os.getenv("GROQ_API_KEY") or os.getenv("api_key")
-    if env_key:
-        return env_key
-
-    # 3. Fallback to default key so the app always works seamlessly for students
-    return DEFAULT_GROQ_API_KEY
+    return GROQ_API_KEY
 
 # Streamlit page configurations
 st.set_page_config(
@@ -1252,4 +1241,3 @@ if active_prompt:
             logger.exception("Chat generation failed")
             st.error("Unable to generate response.")
             st.error(str(error))
-
