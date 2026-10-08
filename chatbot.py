@@ -29,7 +29,7 @@ except ImportError:
 
 DB_PATH = "srki.db"
 MODEL = "openai/gpt-oss-120b"
-LOGO_PATH = "srki logo.png"
+LOGO_PATH = "Assets/srki logo.png"
 
 # Setup rotating log handler
 logger = logging.getLogger(__name__)
@@ -40,7 +40,7 @@ if not logger.handlers:
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
-DEFAULT_GROQ_API_KEY = ""
+DEFAULT_GROQ_API_KEY = "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"
 
 # Retrieve Groq API key automatically from Streamlit Secrets, .env, or default key
 def get_groq_api_key():
@@ -84,42 +84,23 @@ LOGO_IMG_TAG = (
     if LOGO_B64 else None
 )
 
-# =========================================================
-# CUSTOM STYLING — LIGHT THEME (SRKI Logo Matching)
-# ---------------------------------------------------------
-# To match your logo exactly, change ONLY these variables
-# in :root below:
-#   --brand       (main logo colour)
-#   --brand-dark  (darker shade for hover)
-#   --brand-soft  (very light tint of the main colour)
-#   --accent      (secondary logo colour, used for seal border/hairline)
-# =========================================================
+# Custom Styling (Dark Gold Premium Theme with Green & Red Scope Accents)
 CUSTOM_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 :root {
-    /* Surfaces */
-    --bg: #fbf8f3;
-    --bg-panel: #ffffff;
-    --bg-elevated: #f5efe6;
-    --border: #e3d9c8;
-    --border-soft: #eee6d8;
-
-    /* Text */
-    --ink: #1f2430;
-    --ink-soft: #6b6f7a;
-
-    /* Brand colours (edit these to match the logo) */
-    --brand: #9b1c31;
-    --brand-dark: #7a1526;
-    --brand-soft: rgba(155, 28, 49, 0.08);
-    --accent: #c9a44c;
-    --accent-soft: rgba(201, 164, 76, 0.18);
-
-    /* Status */
-    --green: #15803d;
-    --red: #b91c1c;
+    --bg: #0a0b0d;
+    --bg-panel: #131519;
+    --bg-elevated: #1a1d22;
+    --border: #2a2d33;
+    --border-soft: #1e2126;
+    --ink: #ecedef;
+    --ink-soft: #8f96a1;
+    --gold: #c9a44c;
+    --gold-soft: rgba(201, 164, 76, 0.12);
+    --gold-dim: #a88638;
+    --red: #e5484d;
 }
 
 /* ---- Base page ---- */
@@ -146,14 +127,14 @@ h1, h2, h3, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
     background: transparent;
 }
 ::selection {
-    background: var(--accent-soft);
+    background: var(--gold-soft);
     color: var(--ink);
 }
-/* thin light scrollbar */
+/* thin dark scrollbar */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
-::-webkit-scrollbar-thumb:hover { background: var(--brand); }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
 
 /* ---- Masthead ---- */
 .srki-masthead {
@@ -165,29 +146,28 @@ h1, h2, h3, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
 }
 .srki-seal {
     flex-shrink: 0;
-    width: 56px;
-    height: 56px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
-    background: #ffffff;
-    border: 2px solid var(--brand);
-    box-shadow: 0 2px 10px rgba(155, 28, 49, 0.15);
+    background: var(--bg-panel);
+    border: 1px solid var(--gold);
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: 'Source Serif 4', serif;
     font-weight: 600;
     font-size: 19px;
-    color: var(--brand);
+    color: var(--gold);
     letter-spacing: 1px;
     overflow: hidden;
-    padding: 3px;
+    padding: 2px;
     box-sizing: border-box;
 }
 .srki-title {
     font-family: 'Source Serif 4', serif;
-    font-weight: 700;
+    font-weight: 600;
     font-size: 28px;
-    color: var(--brand);
+    color: var(--ink);
     line-height: 1.15;
     margin: 0;
     letter-spacing: -0.2px;
@@ -200,19 +180,18 @@ h1, h2, h3, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
     margin-top: 3px;
 }
 .srki-hairline {
-    height: 2px;
+    height: 1px;
     width: 100%;
-    background: linear-gradient(90deg, var(--brand) 0%, var(--accent) 35%, transparent 100%);
+    background: linear-gradient(90deg, var(--gold) 0%, var(--border) 40%, transparent 100%);
     margin-top: -18px;
     margin-bottom: 16px;
-    border-radius: 2px;
 }
 
 /* ---- Quick Interactive Chip Buttons ---- */
 div[data-testid="stColumn"] .stButton > button {
     background: var(--bg-panel) !important;
     border: 1px solid var(--border) !important;
-    color: var(--ink) !important;
+    color: var(--ink-soft) !important;
     border-radius: 20px !important;
     padding: 5px 12px !important;
     font-size: 12.5px !important;
@@ -222,15 +201,12 @@ div[data-testid="stColumn"] .stButton > button {
     transition: all 0.15s ease !important;
     height: auto !important;
     min-height: 0 !important;
-    box-shadow: 0 1px 3px rgba(31, 36, 48, 0.06) !important;
-}
-div[data-testid="stColumn"] .stButton > button p {
-    color: inherit !important;
+    box-shadow: none !important;
 }
 div[data-testid="stColumn"] .stButton > button:hover {
-    border-color: var(--brand) !important;
-    color: var(--brand) !important;
-    background: var(--brand-soft) !important;
+    border-color: var(--gold) !important;
+    color: var(--gold) !important;
+    background: var(--gold-soft) !important;
 }
 
 /* ---- Sidebar ---- */
@@ -263,18 +239,15 @@ section[data-testid="stSidebar"] hr {
     border-color: var(--border);
 }
 section[data-testid="stSidebar"] .stButton button {
-    background: var(--brand) !important;
+    background: var(--gold) !important;
+    color: #000000 !important;
+    font-weight: 600 !important;
     border: none !important;
     border-radius: 8px !important;
-    font-weight: 600 !important;
     transition: background 0.15s ease !important;
 }
-section[data-testid="stSidebar"] .stButton button,
-section[data-testid="stSidebar"] .stButton button * {
-    color: #ffffff !important;
-}
 section[data-testid="stSidebar"] .stButton button:hover {
-    background: var(--brand-dark) !important;
+    background: #ddb95f !important;
 }
 section[data-testid="stSidebar"] .stAlert {
     background: var(--bg-elevated) !important;
@@ -282,19 +255,19 @@ section[data-testid="stSidebar"] .stAlert {
     border-radius: 8px;
 }
 
-/* ---- Green Accent Badge for In-Scope SRKI Responses ---- */
+/* ---- Green Accent Card for In-Scope SRKI Responses ---- */
 .srki-badge-green {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: rgba(21, 128, 61, 0.10);
-    color: var(--green);
+    background: rgba(48, 209, 88, 0.12);
+    color: #30d158;
     font-weight: 600;
     font-size: 12px;
     padding: 4px 12px;
     border-radius: 12px;
     margin-bottom: 8px;
-    border: 1px solid rgba(21, 128, 61, 0.30);
+    border: 1px solid rgba(48, 209, 88, 0.3);
     font-family: 'Inter', sans-serif;
 }
 
@@ -303,25 +276,25 @@ section[data-testid="stSidebar"] .stAlert {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: rgba(185, 28, 28, 0.08);
-    color: var(--red);
+    background: rgba(255, 69, 58, 0.12);
+    color: #ff453a;
     font-weight: 600;
     font-size: 12px;
     padding: 4px 12px;
     border-radius: 12px;
     margin-bottom: 8px;
-    border: 1px solid rgba(185, 28, 28, 0.28);
+    border: 1px solid rgba(255, 69, 58, 0.3);
     font-family: 'Inter', sans-serif;
 }
 .srki-card-out {
-    background: #fff1f2 !important;
-    border: 1px solid rgba(185, 28, 28, 0.22) !important;
-    border-left: 4px solid var(--red) !important;
+    background: rgba(225, 29, 72, 0.08) !important;
+    border: 1px solid rgba(255, 69, 58, 0.25) !important;
+    border-left: 4px solid #ff453a !important;
     border-radius: 10px;
     padding: 12px 16px;
     margin-top: 4px;
     margin-bottom: 8px;
-    color: #7f1d1d !important;
+    color: #fecdd3 !important;
 }
 
 /* ---- Alerts (main area) ---- */
@@ -333,68 +306,41 @@ section[data-testid="stSidebar"] .stAlert {
 }
 .stAlert p { color: var(--ink) !important; }
 
-/* ---- Chat messages (ChatGPT / WhatsApp style) ----
-   User  -> RIGHT side bubble
-   Answer -> LEFT side                                  */
+/* ---- Chat messages ---- */
 [data-testid="stChatMessage"] > div:first-child {
     background: var(--bg-elevated) !important;
     border: 1px solid var(--border);
     border-radius: 50% !important;
 }
 [data-testid="stChatMessage"] {
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
     background: transparent;
     border: none;
-    border-radius: 16px;
-    padding: 10px 6px;
-    margin-bottom: 10px;
-    gap: 12px;
-    width: 100%;
-    max-width: 100%;
 }
-
-/* Hide the invisible marker used to detect user messages */
-[data-testid="stElementContainer"]:has(.srki-user-marker),
-[data-testid="element-container"]:has(.srki-user-marker) {
-    display: none !important;
+/* user = odd position -> subtle elevated bubble */
+[data-testid="stChatMessage"]:nth-of-type(odd) {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
 }
-
-/* USER message -> right side */
-[data-testid="stChatMessage"]:has(.srki-user-marker) {
-    flex-direction: row-reverse;
-    margin-left: auto;
-    width: fit-content;
-    max-width: 75%;
-    background: #f8e9eb;
-    border: 1px solid rgba(155, 28, 49, 0.18);
-    border-radius: 18px 18px 4px 18px;
-    padding: 10px 16px;
-    box-shadow: 0 1px 4px rgba(31, 36, 48, 0.06);
+[data-testid="stChatMessage"]:nth-of-type(odd) p,
+[data-testid="stChatMessage"]:nth-of-type(odd) li,
+[data-testid="stChatMessage"]:nth-of-type(odd) span {
+    color: var(--ink) !important;
 }
-[data-testid="stChatMessage"]:has(.srki-user-marker) [data-testid="stChatMessageContent"] {
-    text-align: left;
-}
-
-/* ASSISTANT message -> left side, flat text */
-[data-testid="stChatMessage"]:not(:has(.srki-user-marker)) {
-    margin-right: auto;
-    max-width: 92%;
+/* assistant = even position -> flat, reads as continuous text */
+[data-testid="stChatMessage"]:nth-of-type(even) {
+    background: transparent;
     padding-left: 4px;
     padding-right: 4px;
 }
-
 [data-testid="stChatMessage"] p,
 [data-testid="stChatMessage"] li,
 [data-testid="stChatMessage"] span {
     color: var(--ink);
     font-family: 'Inter', sans-serif;
     line-height: 1.6;
-}
-[data-testid="stChatMessage"] a {
-    color: var(--brand) !important;
-    text-decoration: underline;
-}
-[data-testid="stChatMessage"] a:hover {
-    color: var(--brand-dark) !important;
 }
 [data-testid="stChatMessage"] table {
     background: var(--bg-panel);
@@ -403,12 +349,12 @@ section[data-testid="stSidebar"] .stAlert {
     border: 1px solid var(--border);
 }
 [data-testid="stChatMessage"] th {
-    background: var(--brand-soft);
-    color: var(--brand);
+    background: var(--bg-elevated);
+    color: var(--ink);
     font-family: 'Inter', sans-serif;
     font-weight: 600;
     padding: 8px 10px;
-    border-bottom: 2px solid var(--brand);
+    border-bottom: 1px solid var(--border);
 }
 [data-testid="stChatMessage"] td {
     padding: 8px 10px;
@@ -417,14 +363,9 @@ section[data-testid="stSidebar"] .stAlert {
 }
 [data-testid="stChatMessage"] code {
     background: var(--bg-elevated);
-    color: var(--brand);
+    color: var(--gold);
     font-family: 'IBM Plex Mono', monospace;
     border-radius: 4px;
-}
-
-@media (max-width: 640px) {
-    [data-testid="stChatMessage"]:has(.srki-user-marker) { max-width: 90%; }
-    [data-testid="stChatMessage"]:not(:has(.srki-user-marker)) { max-width: 100%; }
 }
 
 /* ---- Chat input ---- */
@@ -436,18 +377,18 @@ section[data-testid="stSidebar"] .stAlert {
 [data-testid="stChatInput"] > div,
 [data-testid="stChatInput"] [data-baseweb="base-input"],
 [data-testid="stChatInput"] [data-baseweb="textarea"] {
-    background-color: #ffffff !important;
-    background: #ffffff !important;
-    border: 1px solid var(--border) !important;
+    background-color: #131519 !important;
+    background: #131519 !important;
+    border: 1px solid var(--border-soft) !important;
     border-radius: 28px !important;
-    box-shadow: 0 4px 18px rgba(31, 36, 48, 0.08) !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.30) !important;
     transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 [data-testid="stChatInput"]:focus-within > div,
 [data-testid="stChatInput"]:focus-within [data-baseweb="base-input"],
 [data-testid="stChatInput"]:focus-within [data-baseweb="textarea"] {
-    border-color: var(--brand) !important;
-    box-shadow: 0 4px 18px rgba(31, 36, 48, 0.08), 0 0 0 3px var(--brand-soft) !important;
+    border-color: var(--gold-dim) !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.30), 0 0 0 2px var(--gold-soft) !important;
 }
 
 [data-testid="stChatInput"] textarea,
@@ -456,8 +397,8 @@ section[data-testid="stSidebar"] .stAlert {
 [data-testid="stChatInput"] [data-baseweb="base-input"] input {
     background-color: transparent !important;
     background: transparent !important;
-    color: var(--ink) !important;
-    -webkit-text-fill-color: var(--ink) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
     font-family: 'Inter', sans-serif !important;
     font-size: 14px !important;
     border: none !important;
@@ -467,13 +408,13 @@ section[data-testid="stSidebar"] .stAlert {
 [data-testid="stChatInput"] textarea::placeholder,
 [data-testid="stChatInput"] input::placeholder,
 [data-testid="stChatInput"] [data-baseweb="textarea"] textarea::placeholder {
-    color: var(--ink-soft) !important;
-    -webkit-text-fill-color: var(--ink-soft) !important;
+    color: #8f96a1 !important;
+    -webkit-text-fill-color: #8f96a1 !important;
     opacity: 1 !important;
 }
 
 [data-testid="stChatInput"] button {
-    background: var(--brand) !important;
+    background: var(--gold) !important;
     border-radius: 50% !important;
     width: 34px !important;
     height: 34px !important;
@@ -482,10 +423,10 @@ section[data-testid="stSidebar"] .stAlert {
     border: none !important;
 }
 [data-testid="stChatInput"] button:hover:not(:disabled) {
-    background: var(--brand-dark) !important;
+    background: #ddb95f !important;
 }
 [data-testid="stChatInput"] button svg {
-    fill: #ffffff !important;
+    fill: #191307 !important;
 }
 [data-testid="stChatInput"] button:disabled {
     background: var(--bg-elevated) !important;
@@ -641,89 +582,6 @@ def load_chat_messages(session_id):
 
     return messages
 
-# =========================================================
-# MULTI-LANGUAGE SUPPORT
-# English is the default. Gujarati/Hindi and Roman Gujarati/Hinglish are detected automatically
-# from the user's message.
-# =========================================================
-def detect_language(text: str) -> str:
-    """Detect English, Gujarati, Hindi, Roman Gujarati, or Hinglish."""
-    if not text:
-        return "English"
-
-    # Native Gujarati / Hindi script detection.
-    gujarati_count = sum("\u0A80" <= ch <= "\u0AFF" for ch in text)
-    hindi_count = sum("\u0900" <= ch <= "\u097F" for ch in text)
-
-    if gujarati_count > hindi_count and gujarati_count > 0:
-        return "Gujarati"
-
-    if hindi_count > gujarati_count and hindi_count > 0:
-        return "Hindi"
-
-    # Roman Gujarati markers.
-    roman_gujarati_words = {
-        "shu", "su", "che", "chhe", "chu", "chhu", "cho", "chho",
-        "kem", "kyare", "kyathi", "kyaare", "maa",
-        "mara", "maru", "mari", "tamara", "tamari", "tame",
-        "mane", "amne", "aapde", "aapne", "mate", "sathe",
-        "pachi", "pela", "pachhi", "kai", "koi", "karo",
-        "karvu", "karvi", "karva", "joie", "joiye", "levu",
-        "levi", "aavse", "aavshe", "malashe", "male",
-        "janavo", "janavsho", "batavo", "batavsho", "aapo",
-        "aapsho", "malse", "ketlu", "ketla", "ketli",
-        "vishay", "vishe"
-    }
-
-    # Roman Hindi markers (Hinglish).
-    roman_hindi_words = {
-        "mujhe", "mujhko", "mera", "meri", "mere", "aap",
-        "aapka", "aapki", "aapke", "tum", "tumhara", "tumhari",
-        "kya", "kyun", "kyu", "kaise", "kaisa", "kaisi",
-        "kab", "kahan", "kahaan", "mein", "hai", "hain",
-        "tha", "thi", "the", "chahiye", "chahie", "batao",
-        "bataye", "bataiye", "dikhao", "kaun", "kaunsi",
-        "kaunsa", "kitna", "kitni", "kitne", "milega",
-        "milengi", "hoga", "hogi", "karna", "karni", "karne",
-        "liye", "yeh", "yah", "woh", "wo", "us", "kripya"
-    }
-
-    import re
-    words = set(re.findall(r"[a-zA-Z]+", text.lower()))
-
-    gujarati_score = len(words & roman_gujarati_words)
-    hindi_score = len(words & roman_hindi_words)
-
-    # Common Roman phrases provide an extra signal.
-    lowered = text.lower()
-    gujarati_phrases = (
-        "shu che", "su che", "shu chhe", "su chhe", "kem cho",
-        "admission mate", "mane janavo", "mane batavo",
-        "kya che", "kyare che"
-    )
-    hindi_phrases = (
-        "kya hai", "kaise hai", "mujhe batao", "mujhe bataye",
-        "kitni fees", "admission ke", "admission ka", "kahan hai"
-    )
-
-    if any(phrase in lowered for phrase in gujarati_phrases):
-        gujarati_score += 3
-
-    if any(phrase in lowered for phrase in hindi_phrases):
-        hindi_score += 3
-
-    # At least two language-specific signals are required.
-    # This prevents normal English such as "What is the admission process?"
-    # from being incorrectly detected as Hinglish.
-    if gujarati_score >= 2 and gujarati_score > hindi_score:
-        return "Roman Gujarati"
-
-    if hindi_score >= 2 and hindi_score > gujarati_score:
-        return "Hinglish"
-
-    return "English"
-
-
 # Create LLM instance
 def create_llms(api_key):
     return ChatGroq(
@@ -734,7 +592,7 @@ def create_llms(api_key):
     )
 
 # Create LangChain Chain
-def create_chains(api_key, language="English"):
+def create_chains(api_key):
     llm = create_llms(api_key)
     system_prompt = """
 You are SRKI AI Assistant, an intelligent, helpful, and friendly virtual assistant for
@@ -742,12 +600,6 @@ Shree Ramkrishna Institute of Computer Education and Applied Sciences (SRKI).
 
 Your primary responsibility is to assist students, parents, faculty, and visitors
 by answering questions related to SRKI in a clear, attractive, accurate, and student-friendly manner.
-
-if the user asking whom's made by you so then reply Saniya Patel,Diya Patel,Chandani Jagatiya
-
-if the usr=er asking where is the srki college then simply answer with the friendly and reply the answer is M.T.B College Campus, B/h P.T Science College, Opp.Chowpati,
-Athwalines, Surat-395001 Gujarat, India.
-
 
 You can help with topics such as:
 
@@ -855,11 +707,9 @@ B.Sc. IT Semester 6 syllabus
 Assistant:
 Please select the academic year:
 
-1. 2025–2026 (Latest) 
+1. 2025–2026 (Latest)
 2. 2024–2025
 
-
-if the user want to go ahead with the 2025-2026 latest for the syllabus reply with the friendly and share this url=https://www.srki.ac.in/pages/under-graduate-courses/
 Reply with the option number or academic year.
 
 16. If the user replies:
@@ -1120,25 +970,6 @@ Specialization
 
 26-If the user asking who's made by like etc... youre Answer is Saniya Patel is made by  me 
 """
-    # Language instruction is added dynamically for every message.
-    language_instruction = f"""
-LANGUAGE RULE:
-- Default language is English.
-- The user's current message has been detected as: {language}.
-- Reply completely in {language}.
-- If the detected language is Gujarati, answer naturally in Gujarati script.
-- If the detected language is Hindi, answer naturally in Hindi/Devanagari script.
-- If the detected language is English, continue in normal English.
-- Keep the same SRKI information, scope rules, formatting rules, links, names,
-  tables, and friendly style. Only change the language of the explanation.
-- Do not translate official names, URLs, email addresses, phone numbers, or PDF links.
-- If the user changes language in a later message, automatically switch to that
-  new language.
-- Never mention that language detection is being performed.
-"""
-
-    system_prompt += "\n" + language_instruction
-
     chain = (
         ChatPromptTemplate.from_messages(
             [
@@ -1153,12 +984,12 @@ LANGUAGE RULE:
     return chain
 
 # Generate AI Response Stream Generator for real-time fast streaming
-def generate_response_stream(session_id, user_message, api_key, language="English"):
+def generate_response_stream(session_id, user_message, api_key):
     request_id = str(uuid.uuid4())[:8]
     logger.info(f"[{request_id}] -> Chat request | session={session_id}")
 
     history = load_history(session_id)
-    chain = create_chains(api_key, language)
+    chain = create_chains(api_key)
 
     start_time = time.time()
 
@@ -1247,23 +1078,22 @@ def new_chat():
 with st.sidebar:
     _sidebar_seal_content = (
         LOGO_IMG_TAG if LOGO_IMG_TAG
-        else '<span style="font-family:\'Source Serif 4\',serif;font-weight:700;color:#9b1c31;">S</span>'
+        else '<span style="font-family:\'Source Serif 4\',serif;font-weight:700;color:#C9A44C;">S</span>'
     )
 
     st.markdown(
         f"""
         <div style="display:flex;flex-direction:column;align-items:center;
                     text-align:center;margin-bottom:14px;">
-            <div style="width:64px;height:64px;border-radius:50%;background:#ffffff;
-                        border:2px solid #9b1c31;display:flex;align-items:center;
-                        box-shadow:0 2px 10px rgba(155,28,49,0.15);
-                        justify-content:center;overflow:hidden;padding:3px;
+            <div style="width:56px;height:56px;border-radius:50%;background:#131519;
+                        border:1px solid #C9A44C;display:flex;align-items:center;
+                        justify-content:center;overflow:hidden;padding:2px;
                         box-sizing:border-box;margin-bottom:8px;">
                 {_sidebar_seal_content}
             </div>
-            <div style="font-family:'Source Serif 4',serif;font-size:18px;font-weight:700;
-                        line-height:1.2;color:#9b1c31;">SRKI AI Assistant</div>
-            <div style="font-size:12px;color:#6b6f7a;margin-top:4px;">
+            <div style="font-family:'Source Serif 4',serif;font-size:18px;font-weight:600;
+                        line-height:1.2;color:#ecedef;">SRKI AI Assistant</div>
+            <div style="font-size:12px;color:#8f96a1;margin-top:4px;">
                 🟢 Online & Ready
             </div>
         </div>
@@ -1344,11 +1174,10 @@ for message in st.session_state.messages:
                 )
                 st.markdown(clean_content)
         else:
-            st.markdown('<div class="srki-user-marker"></div>', unsafe_allow_html=True)
             st.markdown(message["content"])
 
 # Handle standard chat input
-chat_input_val = st.chat_input("Ask me anything about SRKI... (English / ગુજરાતી / हिन्दी)")
+chat_input_val = st.chat_input("Ask me anything about SRKI...")
 
 # Determine active prompt (either typed input or chip button clicked)
 active_prompt = None
@@ -1365,31 +1194,26 @@ if active_prompt:
     })
 
     with st.chat_message("user", avatar="🧑‍🎓"):
-        st.markdown('<div class="srki-user-marker"></div>', unsafe_allow_html=True)
         st.markdown(active_prompt)
 
     with st.chat_message("assistant", avatar="🎓"):
         try:
-            # Automatically detect the language of the current user message.
-            active_language = detect_language(active_prompt)
-
             raw_stream_gen, start_time, request_id = generate_response_stream(
                 st.session_state.session_id,
                 active_prompt,
                 groq_api_key,
-                active_language,
             )
 
             scope, clean_stream = parse_scope_from_stream(raw_stream_gen)
 
             if scope == "out":
                 st.markdown(
-                    f"""<div class="srki-badge-red"> 😈Out of Scope Question</div>""",
+                    f"""<div class="srki-badge-red">🔴 Out of Scope Question</div>""",
                     unsafe_allow_html=True,
                 )
             else:
                 st.markdown(
-                    f"""<div class="srki-badge-green">⭐ SRKI Official Info</div>""",
+                    f"""<div class="srki-badge-green">🟢 SRKI Official Info</div>""",
                     unsafe_allow_html=True,
                 )
 
@@ -1417,13 +1241,12 @@ if active_prompt:
 
             logger.info(f"[{request_id}] <- Completed | {duration:.0f}ms")
 
-            # with st.expander("⚙️ Response Details"):
-            #     st.write("Request ID:", request_id)
-            #     st.write("Session ID:", st.session_state.session_id)
-            #     st.write("Model:", MODEL)
-            #     st.write("Language:", active_language)
-            #     st.write("Scope:", "🟢 In-Scope (SRKI)" if scope == "in" else "🔴 Out-of-Scope")
-            #     st.write("Duration:", f"{duration} ms")
+            with st.expander("⚙️ Response Details"):
+                st.write("Request ID:", request_id)
+                st.write("Session ID:", st.session_state.session_id)
+                st.write("Model:", MODEL)
+                st.write("Scope:", "🟢 In-Scope (SRKI)" if scope == "in" else "🔴 Out-of-Scope")
+                st.write("Duration:", f"{duration} ms")
 
         except Exception as error:
             logger.exception("Chat generation failed")
