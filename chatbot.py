@@ -1252,3 +1252,4 @@ if active_prompt:
             logger.exception("Chat generation failed")
             st.error("Unable to generate response.")
             st.error(str(error))
+
