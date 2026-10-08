@@ -40,7 +40,7 @@ if not logger.handlers:
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
-DEFAULT_GROQ_API_KEY = "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"
+GROQ_API_KEY = "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"
 
 # Retrieve Groq API key automatically from Streamlit Secrets, .env, or default key
 def get_groq_api_key():
